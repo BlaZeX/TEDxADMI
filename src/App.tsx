@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FormType } from './types';
 import { SPEAKERS, SCHEDULE, EVENT_DATE, EVENT_THEME, EVENT_VENUE } from './constants';
 import FormModal from './components/FormModal';
-import IdeaGenerator from './components/IdeaGenerator';
+import Partners from './components/Partners';
 
 // SVG Icon Components
 const MenuIcon: React.FC = () => (
@@ -38,6 +38,7 @@ const Header: React.FC<{ onFormOpen: (form: FormType) => void }> = ({ onFormOpen
     { href: '#about', label: 'About' },
     { href: '#speakers', label: 'Speakers' },
     { href: '#schedule', label: 'Schedule' },
+    { href: '#partners', label: 'Partners' },
     { href: '#contact', label: 'Contact' }
   ];
 
@@ -151,7 +152,7 @@ const App: React.FC = () => {
             </div>
         </Section>
 
-        <IdeaGenerator />
+        <Partners onFormOpen={setActiveForm}/>
 
       </main>
       

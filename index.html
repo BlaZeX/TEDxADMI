@@ -1,16 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html lang="en" class="has-navbar-fixed-top">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TEDxADMI | Genesis</title>
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- AlpineJS -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
+        /* Custom TEDx Styles */
+        html {
             scroll-behavior: smooth;
+        }
+        body, .input, .textarea, .button {
+            font-family: 'Inter', sans-serif;
+        }
+        :root {
+            --tedx-red: #e62b1e;
+            --tedx-black: #000000;
+            --tedx-white: #ffffff;
+            --tedx-grey: #f5f5f5;
+        }
+        .tedx-red { color: var(--tedx-red); }
+        .has-background-tedx-red { background-color: var(--tedx-red); }
+        .button.is-tedx-red {
+            background-color: var(--tedx-red);
+            border-color: transparent;
+            color: var(--tedx-white);
+            font-weight: bold;
+        }
+        .button.is-tedx-red:hover {
+            background-color: #d32012;
+            color: var(--tedx-white);
+        }
+        .navbar.is-black .navbar-brand a.navbar-item {
+            font-weight: 900;
+            font-size: 1.5rem;
+        }
+        .navbar-item.is-active, .navbar-item:hover {
+            background-color: transparent !important;
+            color: var(--tedx-red) !important;
+        }
+        .hero.is-home {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop') no-repeat center center/cover;
+        }
+        .hero .title {
+            font-weight: 900;
+        }
+        .section-title {
+            font-weight: 900;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--tedx-red);
+            margin: 0.5rem auto 0;
+        }
+        .speaker-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .speaker-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 1.5rem rgba(0,0,0,.15);
+        }
+        .speaker-card .card-image img {
+            filter: grayscale(100%);
+            transition: all 0.3s ease;
+        }
+        .speaker-card:hover .card-image img {
+            filter: grayscale(0%);
         }
     </style>
 <script type="importmap">
@@ -19,15 +92,234 @@
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.27.0",
-    "vite": "https://aistudiocdn.com/vite@^7.1.12",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0",
+    "vite": "https://aistudiocdn.com/vite@^7.2.2",
     "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.0"
   }
 }
 </script>
 </head>
-  <body class="bg-gray-50 text-gray-900">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<body>
+
+    <!-- Root AlpineJS component -->
+    <div x-data="{ isNavOpen: false, activeSpeaker: null, registrationSubmitted: false, contactSubmitted: false }">
+
+        <!-- Header -->
+        <nav class="navbar is-fixed-top is-black" role="navigation" aria-label="main navigation">
+            <div class="container">
+                <div class="navbar-brand">
+                    <a class="navbar-item has-text-white" href="#home">
+                        TEDx<span class="tedx-red">ADMI</span>
+                    </a>
+                    <a role="button" class="navbar-burger" :class="{ 'is-active': isNavOpen }" @click="isNavOpen = !isNavOpen" aria-label="menu" aria-expanded="false">
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                    </a>
+                </div>
+                <div class="navbar-menu" :class="{ 'is-active': isNavOpen }">
+                    <div class="navbar-end">
+                        <a href="#home" @click="isNavOpen = false" class="navbar-item has-text-weight-bold">Home</a>
+                        <a href="#about" @click="isNavOpen = false" class="navbar-item has-text-weight-bold">About</a>
+                        <a href="#speakers" @click="isNavOpen = false" class="navbar-item has-text-weight-bold">Speakers</a>
+                        <a href="#register" @click="isNavOpen = false" class="navbar-item has-text-weight-bold">Registration</a>
+                        <a href="#contact" @click="isNavOpen = false" class="navbar-item has-text-weight-bold">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Home Section -->
+        <section id="home" class="hero is-fullheight is-home">
+            <div class="hero-body">
+                <div class="container has-text-centered">
+                    <p class="title is-1 has-text-white">
+                        <span class="tedx-red">TEDx</span>ADMI
+                    </p>
+                    <p class="subtitle is-2 has-text-white has-text-weight-bold tracking-wide">
+                        Genesis
+                    </p>
+                     <div class="is-flex is-justify-content-center is-align-items-center is-flex-direction-column-mobile mb-5">
+                        <span class="icon-text has-text-white is-size-5 mb-2 mr-0 mr-4-tablet">
+                            <span class="icon"><i class="fas fa-calendar-alt"></i></span>
+                            <span>16th November 2025</span>
+                        </span>
+                        <span class="icon-text has-text-white is-size-5">
+                            <span class="icon"><i class="fas fa-map-marker-alt"></i></span>
+                            <span>Marathi Bhasha Bhavan, University of Mumbai</span>
+                        </span>
+                    </div>
+                    <a href="#register" class="button is-tedx-red is-large">
+                        Register Now
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="section is-medium">
+            <div class="container">
+                <h2 class="section-title">About the Event</h2>
+                <div class="columns is-vcentered">
+                    <div class="column">
+                        <h3 class="title is-3">What is <span class="tedx-red">TEDx</span>?</h3>
+                        <p class="is-size-5">
+                            In the spirit of ideas worth spreading, TED has created a program called TEDx. TEDx is a program of local, self-organized events that bring people together to share a TED-like experience. Our event is called TEDxADMI, where x = independently organized TED event.
+                        </p>
+                    </div>
+                    <div class="column">
+                        <h3 class="title is-3">Theme: <span class="has-text-weight-bold">Genesis</span></h3>
+                        <p class="is-size-5">
+                            This year, our theme is "Genesis" — exploring the origins of groundbreaking ideas, the dawn of new technologies, and the very beginnings of movements that shape our world. Join us as we bring together brilliant minds to share powerful ideas about the genesis of change.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Speakers Section -->
+        <section id="speakers" class="section is-medium has-background-light">
+            <div class="container">
+                <h2 class="section-title">Our Speakers</h2>
+                <div x-data="{
+                    speakers: [
+                        { id: 1, name: 'Shivani Gohil', title: 'Marketing & Personal Branding', talk: 'Crafting Your Personal Brand: From Identity to Influence', bio: 'Shivani Gohil is a personal‑branding and image‑consulting specialist based in India. She authored the book *Roots Brand and Image* and holds a record in the India Book of Records. She’s delivered over 100 talks on professional identity and branding. Her expertise lies in helping professionals and entrepreneurs craft strong personal brands in the digital era.', img: 'https://i.pravatar.cc/400?u=shivani' },
+                        { id: 2, name: 'Dr Anu Mehta', title: 'Health & Wellness', talk: 'Re‑Mapping Wellness: Mind‑Body Diagnostics and Healing Beyond the Usual', bio: 'Dr Anu Mehta, PhD (honoris causa), is India’s pioneer and first Master Trainer in META‑Health. She integrates META‑Health diagnostics, NES‑Health scanning, and sound therapy to address emotional and physical well‑being. Her work bridges mind‑body connection, emotional healing, and holistic health education.', img: 'https://i.pravatar.cc/400?u=anu' },
+                        { id: 3, name: 'Sonali Sharma', title: 'Health & Wellness', talk: 'Work‑Life Wellness: Integrating Nutrition, Yoga & Lifestyle for Busy Professionals', bio: 'Sonali Sharma is a certified Hatha‑yoga instructor and nutrition coach known for her wellness initiatives through social media (@fit_with_dt.sonali_sharma). She focuses on practical health routines, nutrition, and work‑life balance for professionals. Her approach merges yoga, diet, and holistic well‑being.', img: 'https://i.pravatar.cc/400?u=sonali' },
+                        { id: 4, name: 'Harsh Vira', title: 'Finance', talk: 'Smart Money Moves: Financial Planning & Market Savvy for the Digital Age', bio: 'Harsh Vira is the Founder & CEO of FinPro Wealth, a financial‑education company. A Certified Financial Planner (CFP) and multiple‑time TEDx speaker, he teaches individuals and students how to make informed investment decisions. His focus is on simplifying wealth creation and promoting financial literacy.', img: 'https://i.pravatar.cc/400?u=harsh' },
+                        { id: 5, name: 'Nimish Ramesh', title: 'Psychology', talk: 'Mind over Career: Navigating Identity, Purpose & Performance', bio: 'Nimish Ramesh is a certified life‑coach, Enneagram specialist, and TEDx speaker. He has a background in engineering and human resources, and his talks explore personal growth, leadership, and emotional intelligence. His philosophy centers on understanding oneself beyond career identity.', img: 'https://i.pravatar.cc/400?u=nimish' },
+                        { id: 6, name: 'Anuvamshi Shetty', title: 'Psychology', talk: 'The Psychology of Tomorrow’s Workplace: Well‑Being, Resilience & Growth', bio: 'Anuvamshi Shetty combines her corporate background with her passion for workplace wellness and mental health. With experience in global firms like Morningstar, she speaks about resilience, mindfulness, and psychological safety in modern organizations.', img: 'https://i.pravatar.cc/400?u=anuvamshi' },
+                        { id: 7, name: 'Manish Samota', title: 'Technology', talk: 'Building the Future: AI, Cloud & Product Strategy for the Digital Era', bio: 'Manish Samota is Head of Products at Jio AI Cloud. He leads strategy and development for large‑scale AI and cloud platforms. A TEDx speaker and technology leader, his insights focus on how AI and product innovation shape the digital future.', img: 'https://i.pravatar.cc/400?u=manish' },
+                        { id: 8, name: 'Udit Goenka', title: 'Technology', talk: 'From Startup to AI Studio: The Next Wave of Tech Entrepreneurship', bio: 'Udit Goenka is an entrepreneur, angel investor, and founder of TinyCheque, India’s first venture studio focused on autonomous AI systems. From a self‑taught web developer to a serial entrepreneur, he champions the future of startups powered by AI and automation.', img: 'https://i.pravatar.cc/400?u=udit' }
+                    ]
+                }">
+                    <div class="columns is-multiline is-centered">
+                        <template x-for="speaker in speakers" :key="speaker.id">
+                            <div class="column is-one-quarter-desktop is-half-tablet">
+                                <div class="card speaker-card" @click="activeSpeaker = (activeSpeaker === speaker.id ? null : speaker.id)">
+                                    <div class="card-image">
+                                        <figure class="image is-1by1">
+                                            <img :src="speaker.img" :alt="speaker.name">
+                                        </figure>
+                                    </div>
+                                    <div class="card-content has-text-centered">
+                                        <p class="title is-4" x-text="speaker.name"></p>
+                                        <p class="subtitle is-6 tedx-red" x-text="speaker.title"></p>
+                                    </div>
+                                </div>
+                                <div x-show="activeSpeaker === speaker.id" x-collapse>
+                                    <div class="box mt-2">
+                                        <p class="has-text-weight-bold mb-2">Talk: "<span x-text="speaker.talk"></span>"</p>
+                                        <p x-text="speaker.bio"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Registration Section -->
+        <section id="register" class="section is-medium">
+            <div class="container" style="max-width: 768px;">
+                <h2 class="section-title">Registration</h2>
+                <div x-show="registrationSubmitted" x-transition class="notification is-success has-text-centered">
+                    <h3 class="title is-4">Thank You!</h3>
+                    <p>Your registration has been received. We look forward to seeing you at the event!</p>
+                </div>
+                <form x-show="!registrationSubmitted" @submit.prevent="registrationSubmitted = true" x-transition>
+                    <div class="field">
+                        <label class="label">Full Name</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="e.g. Jane Doe" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Email ID</label>
+                        <div class="control">
+                            <input class="input" type="email" placeholder="e.g. jane.doe@example.com" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Phone No.</label>
+                        <div class="control">
+                            <input class="input" type="tel" placeholder="e.g. +91 12345 67890" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Profession</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="e.g. Product Manager" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Designation</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="e.g. Senior Product Manager" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Organization/Institution</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="e.g. Example Inc." required>
+                        </div>
+                    </div>
+                    <div class="field has-text-centered mt-5">
+                        <div class="control">
+                            <button class="button is-tedx-red is-large" type="submit">Submit Registration</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section is-medium has-background-dark has-text-light">
+             <div class="container" style="max-width: 768px;">
+                <h2 class="section-title has-text-light">Contact Us</h2>
+                <p class="has-text-centered is-size-5 mb-6">Have questions or want to become a partner? Reach out to us.</p>
+                <div x-show="contactSubmitted" x-transition class="notification is-success has-text-centered">
+                    <h3 class="title is-4">Message Sent!</h3>
+                    <p>Thank you for contacting us. We will get back to you shortly.</p>
+                </div>
+                 <form x-show="!contactSubmitted" @submit.prevent="contactSubmitted = true" x-transition>
+                     <div class="field">
+                        <label class="label has-text-light">Your Name</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="Your Name" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label has-text-light">Your Email</label>
+                        <div class="control">
+                            <input class="input" type="email" placeholder="Your Email" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label has-text-light">Message</label>
+                        <div class="control">
+                            <textarea class="textarea" rows="5" placeholder="Your message here..." required></textarea>
+                        </div>
+                    </div>
+                    <div class="field has-text-centered mt-5">
+                        <div class="control">
+                            <button class="button is-tedx-red is-large" type="submit">Send Message</button>
+                        </div>
+                    </div>
+                 </form>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer has-background-black has-text-centered has-text-white-ter">
+            <div class="container">
+                <p class="title is-4 has-text-white">TEDx<span class="tedx-red">ADMI</span></p>
+                <p class="mb-4">This independent TEDx event is operated under license from TED.</p>
+                <p class="has-text-grey-light">&copy; 2024 TEDxADMI. All Rights Reserved.</p>
+            </div>
+        </footer>
+
+    </div>
+</body>
 </html>

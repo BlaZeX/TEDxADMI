@@ -169,7 +169,87 @@
 <body>
 
     <!-- Root AlpineJS component -->
-    <div x-data="{ isNavOpen: false, activeSpeaker: null, registrationSubmitted: false, contactSubmitted: false }">
+    <div x-data="{
+        isNavOpen: false,
+        activeSpeaker: null,
+        
+        // Form handling logic
+        // IMPORTANT: Replace with your Google Apps Script Web App URL
+        scriptURL: 'YOUR_GOOGLE_SCRIPT_URL_HERE',
+
+        registration: {
+            loading: false,
+            submitted: false,
+            error: '',
+            fullname: '',
+            email: '',
+            phone: '',
+            profession: '',
+            designation: '',
+            organization: ''
+        },
+
+        contact: {
+            loading: false,
+            submitted: false,
+            error: '',
+            name: '',
+            email: '',
+            message: ''
+        },
+
+        async submitRegistration() {
+            this.registration.loading = true;
+            this.registration.error = '';
+            
+            const payload = { ...this.registration, formType: 'registration' };
+
+            try {
+                const response = await fetch(this.scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.result !== 'success') {
+                    throw new Error('Submission failed');
+                }
+                
+                this.registration.submitted = true;
+            } catch (error) {
+                console.error('Error submitting registration:', error);
+                this.registration.error = 'Sorry, there was an error submitting your application. Please try again later.';
+            } finally {
+                this.registration.loading = false;
+            }
+        },
+
+        async submitContact() {
+            this.contact.loading = true;
+            this.contact.error = '';
+            
+            const payload = { ...this.contact, formType: 'contact' };
+
+            try {
+                const response = await fetch(this.scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.result !== 'success') {
+                    throw new Error('Submission failed');
+                }
+
+                this.contact.submitted = true;
+            } catch (error) {
+                console.error('Error submitting contact form:', error);
+                this.contact.error = 'Sorry, there was an error sending your message. Please try again later.';
+            } finally {
+                this.contact.loading = false;
+            }
+        }
+    }">
 
         <!-- Header -->
         <nav class="navbar is-fixed-top is-black" role="navigation" aria-label="main navigation">
@@ -386,50 +466,54 @@
             <div class="container" style="max-width: 768px;">
                 <h2 class="section-title">Registration</h2>
                 <p class="has-text-centered is-size-5 mb-6">Please note: Seats are limited. Submitting this form adds you to our applicant list. Confirmation will be sent via email based on availability.</p>
-                <div x-show="registrationSubmitted" x-transition class="notification is-success has-text-centered">
+                
+                <div x-show="registration.submitted" x-transition class="notification is-success has-text-centered">
                     <h3 class="title is-4">Thank You!</h3>
                     <p>Your application has been received. We will notify you via email if your spot is confirmed, based on availability.</p>
                 </div>
-                <form x-show="!registrationSubmitted" @submit.prevent="registrationSubmitted = true" x-transition>
+                
+                <div x-show="registration.error" x-transition class="notification is-danger" x-text="registration.error"></div>
+
+                <form x-show="!registration.submitted" @submit.prevent="submitRegistration" x-transition>
                     <div class="field">
                         <label class="label">Full Name</label>
                         <div class="control">
-                            <input class="input" type="text" placeholder="e.g. Jane Doe" required>
+                            <input class="input" type="text" placeholder="e.g. Jane Doe" x-model="registration.fullname" required>
                         </div>
                     </div>
                     <div class="field">
                         <label class="label">Email ID</label>
                         <div class="control">
-                            <input class="input" type="email" placeholder="e.g. jane.doe@example.com" required>
+                            <input class="input" type="email" placeholder="e.g. jane.doe@example.com" x-model="registration.email" required>
                         </div>
                     </div>
                     <div class="field">
                         <label class="label">Phone No.</label>
                         <div class="control">
-                            <input class="input" type="tel" placeholder="e.g. +91 12345 67890" required>
+                            <input class="input" type="tel" placeholder="e.g. +91 12345 67890" x-model="registration.phone" required>
                         </div>
                     </div>
                     <div class="field">
                         <label class="label">Profession</label>
                         <div class="control">
-                            <input class="input" type="text" placeholder="e.g. Product Manager" required>
+                            <input class="input" type="text" placeholder="e.g. Product Manager" x-model="registration.profession" required>
                         </div>
                     </div>
                     <div class="field">
                         <label class="label">Designation</label>
                         <div class="control">
-                            <input class="input" type="text" placeholder="e.g. Senior Product Manager" required>
+                            <input class="input" type="text" placeholder="e.g. Senior Product Manager" x-model="registration.designation" required>
                         </div>
                     </div>
                     <div class="field">
                         <label class="label">Organization/Institution</label>
                         <div class="control">
-                            <input class="input" type="text" placeholder="e.g. Example Inc." required>
+                            <input class="input" type="text" placeholder="e.g. Example Inc." x-model="registration.organization" required>
                         </div>
                     </div>
                     <div class="field has-text-centered mt-5">
                         <div class="control">
-                            <button class="button is-tedx-red is-large" type="submit">Submit Registration</button>
+                            <button class="button is-tedx-red is-large" :class="{ 'is-loading': registration.loading }" :disabled="registration.loading" type="submit">Submit Registration</button>
                         </div>
                     </div>
                 </form>
@@ -441,32 +525,36 @@
              <div class="container" style="max-width: 768px;">
                 <h2 class="section-title has-text-light">Contact Us</h2>
                 <p class="has-text-centered is-size-5 mb-6">Have questions or want to become a partner? Reach out to us.</p>
-                <div x-show="contactSubmitted" x-transition class="notification is-success has-text-centered">
+                
+                <div x-show="contact.submitted" x-transition class="notification is-success has-text-centered">
                     <h3 class="title is-4">Message Sent!</h3>
                     <p>Thank you for contacting us. We will get back to you shortly.</p>
                 </div>
-                 <form x-show="!contactSubmitted" @submit.prevent="contactSubmitted = true" x-transition>
+
+                <div x-show="contact.error" x-transition class="notification is-danger" x-text="contact.error"></div>
+
+                 <form x-show="!contact.submitted" @submit.prevent="submitContact" x-transition>
                      <div class="field">
                         <label class="label has-text-light">Your Name</label>
                         <div class="control">
-                            <input class="input" type="text" placeholder="Your Name" required>
+                            <input class="input" type="text" placeholder="Your Name" x-model="contact.name" required>
                         </div>
                     </div>
                     <div class="field">
                         <label class="label has-text-light">Your Email</label>
                         <div class="control">
-                            <input class="input" type="email" placeholder="Your Email" required>
+                            <input class="input" type="email" placeholder="Your Email" x-model="contact.email" required>
                         </div>
                     </div>
                     <div class="field">
                         <label class="label has-text-light">Message</label>
                         <div class="control">
-                            <textarea class="textarea" rows="5" placeholder="Your message here..." required></textarea>
+                            <textarea class="textarea" rows="5" placeholder="Your message here..." x-model="contact.message" required></textarea>
                         </div>
                     </div>
                     <div class="field has-text-centered mt-5">
                         <div class="control">
-                            <button class="button is-tedx-red is-large" type="submit">Send Message</button>
+                            <button class="button is-tedx-red is-large" :class="{ 'is-loading': contact.loading }" :disabled="contact.loading" type="submit">Send Message</button>
                         </div>
                     </div>
                  </form>

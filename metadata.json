@@ -1,5 +1,4 @@
 {
   "name": "TEDxADMI Event Website",
-  "description": "A modern, responsive website for the upcoming TEDxADMI event at Mumbai University. It includes event details, speaker information, a schedule, and forms for attendee registration, contact, and feedback, all designed according to TEDx branding guidelines. It also features an AI-powered 'TEDx Idea Generator' using the Gemini API.",
-  "requestFramePermissions": []
+  "description": "A modern, responsive website for the upcoming TEDxADMI event at Mumbai University. It includes event details, speaker information, a schedule, and forms for attendee registration, contact, and feedback, all designed according to TEDx branding guidelines. It also features an AI-powered 'TEDx Idea Generator' using the Gemini API."
 }

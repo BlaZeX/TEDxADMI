@@ -85,6 +85,84 @@
         .speaker-card:hover .card-image img {
             filter: grayscale(0%);
         }
+        
+        /* Schedule Timeline Styles */
+        .timeline {
+            position: relative;
+            max-width: 700px;
+            margin: 0 auto;
+            padding-top: 1rem;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 1.5rem;
+            height: 100%;
+            width: 4px;
+            background: #dbdbdb;
+            border-radius: 2px;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2.5rem;
+        }
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+        .timeline-content {
+            margin-left: 4.5rem;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            background: var(--tedx-white);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .timeline-marker {
+            position: absolute;
+            top: 0.25rem;
+            left: 1.5rem;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--tedx-black);
+            color: var(--tedx-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid var(--tedx-grey);
+            font-size: 1.25rem;
+            z-index: 1;
+        }
+        .timeline-marker.is-red {
+            background-color: var(--tedx-red);
+        }
+        .timeline-content .heading {
+            font-weight: bold;
+            color: #7a7a7a;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.25rem;
+        }
+        .timeline-content .title {
+            margin-bottom: 0.5rem !important;
+        }
+
+        @media screen and (max-width: 768px) {
+            .timeline::before {
+                left: 1.25rem;
+            }
+            .timeline-content {
+                margin-left: 3.5rem;
+            }
+            .timeline-marker {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+                left: 1.25rem;
+            }
+        }
     </style>
 <script type="importmap">
 {
@@ -109,7 +187,7 @@
             <div class="container">
                 <div class="navbar-brand">
                     <a class="navbar-item has-text-white" href="#home">
-                        TEDx<span class="tedx-red">ADMI</span>
+                        <span class="tedx-red">TEDx</span>ADMI
                     </a>
                     <a role="button" class="navbar-burger" :class="{ 'is-active': isNavOpen }" @click="isNavOpen = !isNavOpen" aria-label="menu" aria-expanded="false">
                         <span aria-hidden="true"></span>
@@ -122,6 +200,7 @@
                         <a href="#home" @click="isNavOpen = false" class="navbar-item has-text-weight-bold">Home</a>
                         <a href="#about" @click="isNavOpen = false" class="navbar-item has-text-weight-bold">About</a>
                         <a href="#speakers" @click="isNavOpen = false" class="navbar-item has-text-weight-bold">Speakers</a>
+                        <a href="#schedule" @click="isNavOpen = false" class="navbar-item has-text-weight-bold">Schedule</a>
                         <a href="#register" @click="isNavOpen = false" class="navbar-item has-text-weight-bold">Registration</a>
                         <a href="#contact" @click="isNavOpen = false" class="navbar-item has-text-weight-bold">Contact Us</a>
                     </div>
@@ -216,6 +295,98 @@
                                 </div>
                             </div>
                         </template>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Schedule Section -->
+        <section id="schedule" class="section is-medium has-background-light">
+            <div class="container">
+                <h2 class="section-title">Event Schedule</h2>
+                <div class="timeline">
+                    <!-- Item 1-->
+                    <div class="timeline-item">
+                        <div class="timeline-marker is-red">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <p class="heading">09:30 - 10:15</p>
+                            <p class="title is-4">Registration</p>
+                            <p>Arrive, check-in, and get ready for a day of inspiration.</p>
+                        </div>
+                    </div>
+        
+                    <!-- Item 2 -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker">
+                            <i class="fas fa-microphone"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <p class="heading">10:15 - 10:30</p>
+                            <p class="title is-4">Director's speech & welcome</p>
+                            <p>Kicking off the event with a warm welcome and opening remarks.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 3 -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <p class="heading">10:30 - 12:30</p>
+                            <p class="title is-4">Session 1 <span class="tag is-dark ml-2">4 speakers</span></p>
+                            <p>Our first set of incredible speakers take the stage to share their ideas.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 4 -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker is-red">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <p class="heading">12:30 - 13:30</p>
+                            <p class="title is-4">Lunch break</p>
+                            <p>Refuel and recharge. Enjoy a delicious lunch and connect with fellow attendees.</p>
+                        </div>
+                    </div>
+        
+                    <!-- Item 5 -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <p class="heading">13:30 - 15:30</p>
+                            <p class="title is-4">Session 2 <span class="tag is-dark ml-2">4 speakers</span></p>
+                            <p>The inspiration continues with our second block of insightful talks.</p>
+                        </div>
+                    </div>
+        
+                    <!-- Item 6 -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <p class="heading">15:30 - 15:45</p>
+                            <p class="title is-4">Vote of Thanks</p>
+                            <p>Concluding the talks with a heartfelt thank you to everyone involved.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Item 7 -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker is-red">
+                            <i class="fas fa-mug-hot"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <p class="heading">15:45 - 16:00</p>
+                            <p class="title is-4">High-tea & networking</p>
+                            <p>Connect, discuss the day's ideas, and network over high-tea.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -316,9 +487,9 @@
         <!-- Footer -->
         <footer class="footer has-background-black has-text-centered has-text-white-ter">
             <div class="container">
-                <p class="title is-4 has-text-white">TEDx<span class="tedx-red">ADMI</span></p>
+                <p class="title is-4 has-text-white"><span class="tedx-red">TEDx</span>ADMI</p>
                 <p class="mb-4">This independent TEDx event is operated under license from TED.</p>
-                <p class="has-text-grey-light">&copy; 2024 TEDxADMI. All Rights Reserved.</p>
+                <p class="has-text-grey-light">&copy; 2025 TEDxADMI. All Rights Reserved.</p>
             </div>
         </footer>
 

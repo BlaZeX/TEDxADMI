@@ -173,9 +173,8 @@
         isNavOpen: false,
         activeSpeaker: null,
         
-        // Form handling logic
         // IMPORTANT: Replace with your Google Apps Script Web App URL
-        scriptURL: 'https://script.google.com/macros/s/AKfycbyo9SNXzoQ1ZLBFVfGG6c7MobIbUJTNg-zLjN3nJ6D91kRhNgMnsTcA15fsLS-Vdbu7/exec',
+        scriptURL: 'https://script.google.com/macros/s/AKfycbxq_f49jazqaZt24ixvazswMnfRm9hdtjUX4NYTJm1Co1Jvd2OzRRt3-omSlJmGkEwK/exec',
 
         registration: {
             loading: false,
@@ -197,8 +196,51 @@
             email: '',
             message: ''
         },
+        
+        // JSONP submission function
+        submitViaJSONP(formType, payload) {
+            const callbackName = `jsonp_callback_${Math.round(100000 * Math.random())}`;
+            
+            // Define the callback function on the window object
+            window[callbackName] = (response) => {
+                const formState = formType === 'registration' ? this.registration : this.contact;
+                formState.loading = false;
 
-        async submitRegistration() {
+                if (response.result === 'success') {
+                    formState.submitted = true;
+                } else {
+                    formState.error = 'Sorry, there was an error submitting your form. Please try again later.';
+                    console.error('Submission error:', response.error);
+                }
+
+                // Cleanup
+                delete window[callbackName];
+                document.getElementById(scriptId).remove();
+            };
+            
+            payload.callback = callbackName;
+            const params = new URLSearchParams(payload);
+            const scriptId = `jsonp-script-${callbackName}`;
+            const script = document.createElement('script');
+            script.id = scriptId;
+            script.src = `${this.scriptURL}?${params.toString()}`;
+            document.head.appendChild(script);
+
+            // Timeout for error handling
+            setTimeout(() => {
+                if (window[callbackName]) { // if callback hasn't been called, it's a timeout
+                    const formState = formType === 'registration' ? this.registration : this.contact;
+                    formState.loading = false;
+                    formState.error = 'The submission timed out. Please check your connection and try again.';
+                    delete window[callbackName];
+                    if (document.getElementById(scriptId)) {
+                        document.getElementById(scriptId).remove();
+                    }
+                }
+            }, 10000); // 10-second timeout
+        },
+
+        submitRegistration() {
             this.registration.loading = true;
             this.registration.error = '';
             
@@ -211,28 +253,11 @@
                 designation: this.registration.designation,
                 organization: this.registration.organization
             };
-
-            try {
-                const response = await fetch(this.scriptURL, {
-                    method: 'POST',
-                    body: new URLSearchParams(payload)
-                });
-                const result = await response.json();
-
-                if (result.result !== 'success') {
-                    throw new Error(result.error || 'Submission failed');
-                }
-                
-                this.registration.submitted = true;
-            } catch (error) {
-                console.error('Error submitting registration:', error);
-                this.registration.error = 'Sorry, there was an error submitting your application. Please try again later.';
-            } finally {
-                this.registration.loading = false;
-            }
+            
+            this.submitViaJSONP('registration', payload);
         },
 
-        async submitContact() {
+        submitContact() {
             this.contact.loading = true;
             this.contact.error = '';
             
@@ -242,25 +267,8 @@
                 email: this.contact.email,
                 message: this.contact.message
             };
-
-            try {
-                const response = await fetch(this.scriptURL, {
-                    method: 'POST',
-                    body: new URLSearchParams(payload)
-                });
-                const result = await response.json();
-
-                if (result.result !== 'success') {
-                    throw new Error(result.error || 'Submission failed');
-                }
-
-                this.contact.submitted = true;
-            } catch (error) {
-                console.error('Error submitting contact form:', error);
-                this.contact.error = 'Sorry, there was an error sending your message. Please try again later.';
-            } finally {
-                this.contact.loading = false;
-            }
+            
+            this.submitViaJSONP('contact', payload);
         }
     }">
 

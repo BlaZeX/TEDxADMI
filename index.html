@@ -175,7 +175,7 @@
         
         // Form handling logic
         // IMPORTANT: Replace with your Google Apps Script Web App URL
-        scriptURL: 'https://script.google.com/macros/s/AKfycbyIXVDJzyAU5oybZ3c-WYmWgsXbbe0RNCyAAqcq0PavmTnA_TH4Kbtcu0Zp10B3mowO/exec',
+        scriptURL: 'https://script.google.com/macros/s/AKfycbyo9SNXzoQ1ZLBFVfGG6c7MobIbUJTNg-zLjN3nJ6D91kRhNgMnsTcA15fsLS-Vdbu7/exec',
 
         registration: {
             loading: false,
@@ -202,17 +202,25 @@
             this.registration.loading = true;
             this.registration.error = '';
             
-            const payload = { ...this.registration, formType: 'registration' };
+            const payload = {
+                formType: 'registration',
+                fullname: this.registration.fullname,
+                email: this.registration.email,
+                phone: this.registration.phone,
+                profession: this.registration.profession,
+                designation: this.registration.designation,
+                organization: this.registration.organization
+            };
 
             try {
                 const response = await fetch(this.scriptURL, {
                     method: 'POST',
-                    body: JSON.stringify(payload)
+                    body: new URLSearchParams(payload)
                 });
                 const result = await response.json();
 
                 if (result.result !== 'success') {
-                    throw new Error('Submission failed');
+                    throw new Error(result.error || 'Submission failed');
                 }
                 
                 this.registration.submitted = true;
@@ -228,17 +236,22 @@
             this.contact.loading = true;
             this.contact.error = '';
             
-            const payload = { ...this.contact, formType: 'contact' };
+            const payload = {
+                formType: 'contact',
+                name: this.contact.name,
+                email: this.contact.email,
+                message: this.contact.message
+            };
 
             try {
                 const response = await fetch(this.scriptURL, {
                     method: 'POST',
-                    body: JSON.stringify(payload)
+                    body: new URLSearchParams(payload)
                 });
                 const result = await response.json();
 
                 if (result.result !== 'success') {
-                    throw new Error('Submission failed');
+                    throw new Error(result.error || 'Submission failed');
                 }
 
                 this.contact.submitted = true;

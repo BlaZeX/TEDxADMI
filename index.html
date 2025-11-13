@@ -17,8 +17,6 @@
     <!-- AlpineJS -->
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
-    <!-- Cloudflare Turnstile CAPTCHA -->
-    <script src="https://challenges.cloudflare.com/turnstile/v2/api.js" async defer></script>
     
     <style>
         /* Custom TEDx Styles */
@@ -113,7 +111,7 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-            height: 100%;
+            height: auto;
         }
         .speaker-card:hover {
             transform: translateY(-10px);
@@ -311,11 +309,11 @@
             this.registration.loading = true;
             this.registration.error = '';
             const formData = new FormData(event.target);
-            const turnstileToken = formData.get('cf-turnstile-response');
+            const captcha = formData.get('simple-captcha');
 
-            if (!turnstileToken) {
+            if (!captcha || captcha.trim().toLowerCase() !== 'tedxadmi') {
                 this.registration.loading = false;
-                this.registration.error = 'Please complete the CAPTCHA challenge before submitting.';
+                this.registration.error = 'Please type &quot;TEDxADMI&quot; in the security check field to verify you are human.';
                 return;
             }
 
@@ -326,8 +324,7 @@
                 phone: this.registration.phone,
                 profession: this.registration.profession,
                 designation: this.registration.designation,
-                organization: this.registration.organization,
-                'cf-turnstile-response': turnstileToken
+                organization: this.registration.organization
             };
             this.submitViaJSONP('registration', payload);
         },
@@ -336,11 +333,11 @@
             this.contact.loading = true;
             this.contact.error = '';
             const formData = new FormData(event.target);
-            const turnstileToken = formData.get('cf-turnstile-response');
+            const captcha = formData.get('simple-captcha');
 
-            if (!turnstileToken) {
+            if (!captcha || captcha.trim().toLowerCase() !== 'tedxadmi') {
                 this.contact.loading = false;
-                this.contact.error = 'Please complete the CAPTCHA challenge before submitting.';
+                this.contact.error = 'Please type &quot;TEDxADMI&quot; in the security check field to verify you are human.';
                 return;
             }
 
@@ -348,8 +345,7 @@
                 formType: 'contact',
                 name: this.contact.name,
                 email: this.contact.email,
-                message: this.contact.message,
-                'cf-turnstile-response': turnstileToken
+                message: this.contact.message
             };
             this.submitViaJSONP('contact', payload);
         }
@@ -770,9 +766,12 @@
                                 <span class="icon is-small is-left"><i class="fas fa-building"></i></span>
                             </div>
                         </div>
-                        <div class="field is-flex is-justify-content-center my-5">
-                            <!-- Cloudflare Turnstile Testing Key: Always Pass -->
-                            <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA"></div>
+                        <div class="field my-4">
+                            <label class="label">Security Check</label>
+                            <div class="control">
+                                <p class="help mb-1">Please type <strong>TEDxADMI</strong> below to verify submission.</p>
+                                <input class="input" type="text" name="simple-captcha" placeholder="Type TEDxADMI" required>
+                            </div>
                         </div>
                         <div class="field has-text-centered">
                             <div class="control">
@@ -816,9 +815,12 @@
                             <textarea class="textarea has-background-grey-darker has-text-white" rows="5" placeholder="Your message here..." x-model="contact.message" required style="border-color: #444;"></textarea>
                         </div>
                     </div>
-                    <div class="field is-flex is-justify-content-center my-5">
-                        <!-- Cloudflare Turnstile Testing Key: Always Pass -->
-                        <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA"></div>
+                    <div class="field my-4">
+                        <label class="label has-text-light">Security Check</label>
+                        <div class="control">
+                            <p class="help has-text-grey-light mb-1">Please type <strong>TEDxADMI</strong> below.</p>
+                            <input class="input has-background-grey-darker has-text-white" type="text" name="simple-captcha" placeholder="Type TEDxADMI" required style="border-color: #444;">
+                        </div>
                     </div>
                     <div class="field has-text-centered">
                         <div class="control">
